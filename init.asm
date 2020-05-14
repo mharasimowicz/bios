@@ -126,11 +126,28 @@ add bx, 2
 cmp bx, 0x0400
 jl set_interrupt
 xor bx, bx
+
 sti
-;hlt
-;mov bx, 0xDEAD
-int 0xFF
-;jmp $
+
+;pusha
+read_ports:
+mov ax, 0xe000
+mov es, ax
+xor ax, ax
+xor bx, bx
+xor dx, dx
+read_selected_port:
+in al, dx
+mov bx, dx
+mov [es:bx], al
+inc dx
+cmp dx, 0x00ff
+jle read_selected_port
+all_port_read:
+;popa
+jmp $
+
+
 
 handle_int_0x00_divide_by_zero:
 mov bx, 0xFF00
