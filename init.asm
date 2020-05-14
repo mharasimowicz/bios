@@ -20,29 +20,37 @@ mov ax, 0x0000
 mov ds, ax
 cli
 ; divide by 0
-mov [ds:0x0000], dword not_implemented
+mov [ds:0x0000], dword handle_divide_by_zero_interrupt
 mov [ds:0x0002], dword 0xf000 
 ; single step
-mov [ds:0x0004], dword not_implemented
+mov [ds:0x0004], dword handle_single_step_interrupt
 mov [ds:0x0006], dword 0xf000
 ;power fail
-mov [ds:0x0008], dword not_implemented
+mov [ds:0x0008], dword handle_power_fail_interrupt
 mov [ds:0x000a], dword 0xf000
 ;breakpoint
-mov [ds:0x000c], dword not_implemented
+mov [ds:0x000c], dword handle_breakpoint
 mov [ds:0x000e], dword 0xf000
 ;overflow
-mov [ds:0x0010], dword not_implemented
+mov [ds:0x0010], dword handle_overflow
 mov [ds:0x0012], dword 0xf000 
 sti
-int 4
-not_implemented:
-mov ax, 0xabab
-mov bx, 0xcece
-mov cx, 0xefef
-mov dx, 0x7788 
-jmp $
+hlt
+xor ax, ax
+zonc:
+inc ax
+jmp zonc
 
+handle_divide_by_zero_interrupt:
+jmp $
+handle_single_step_interrupt:
+jmp $
+handle_power_fail_interrupt:
+jmp $
+handle_breakpoint:
+jmp $
+handle_overflow:
+jmp $
 
 ; padding for initial step
 times 0xffff0 - ($-$$) db 0
