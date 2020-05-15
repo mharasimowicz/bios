@@ -1,0 +1,2 @@
+idt_init:
+    ret

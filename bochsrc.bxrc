@@ -4,7 +4,7 @@ config_interface: textconfig
 display_library: win32
 memory: host=32, guest=32
 romimage: file="D:\projects\bios\bin\bios.bin", address=0x00000000, options=none
-vgaromimage: file="D:\programs\bochs\Bochs-2.6.11/VGABIOS-lgpl-latest"
+# vgaromimage: file="D:\programs\bochs\Bochs-2.6.11/VGABIOS-lgpl-latest"
 boot: floppy
 floppy_bootsig_check: disabled=0
 # no floppya
