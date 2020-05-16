@@ -1,5 +1,8 @@
 ;16 bit mode
+[bits 16]
+
 times 0xf0000 - ($-$$) db 0
+
 ; main loop
 __start:
 mov ax, 0x0000
@@ -24,14 +27,17 @@ mov gs, ax
 
 call ivt_init
 call gdt_init
-;call idt_init
-;call enter_protected_mode
+call idt_init
 
 jmp $
+
 
 %include "ivt\init.asm"
 %include "gdt\init.asm"
 %include "idt\init.asm"
+
+
+
 ;%include "enter_protected_mode.asm"
 ; padding for initial step
 times 0xffff0 - ($-$$) db 0
