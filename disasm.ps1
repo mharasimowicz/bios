@@ -1,0 +1,1 @@
+& "C:\Program Files\NASM\ndisasm.exe" D:\projects\bios\bin\bios.bin -p intel > D:\projects\bios\bin\bios.disasm

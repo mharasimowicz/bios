@@ -14,31 +14,14 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; we are going to store GDT on this address
-GDT_ADDRESS equ 0x00000800
 
 
-gdt_init:
-    cli
-    ; set offset
-    xor   eax, eax
-    mov   ax, ds
-    shl   eax, 4
-    add   eax, gdt_null_segment
-    mov   [GDT_ADDRESS + 2], eax
-    ; set size
-    mov   eax, gdt_end
-    sub   eax, gdt_null_segment    
-    mov   [GDT_ADDRESS], ax
-    ; load GDT
-    lgdt  [GDT_ADDRESS]
-    sti
-    ; cleanup
-    xor   eax, eax
-    ret
-    
+gdt_ptr:
+dw gdt_end - gdt_start
+dd gdt_start
 
 ; Basic GDT structure
+gdt_start:
 ; null segment (required)
 gdt_null_segment:
     ; limit 0-15
@@ -67,9 +50,9 @@ gdt_code_segment:
     ; base 16-23
     db 0
     ; access
-    db 0x9A ; code segment
+    db 10011010b ; code segment
     ; limit_16-19 + flags
-    db 0xFC ; 4kb blocks & 32bit
+    db 11001111b ; 4kb blocks & 32bit
     ; base 24-31
     db 0
 
@@ -84,9 +67,9 @@ gdt_data_segment:
     ; base 16-23
     db 0
     ; access
-    db 0x92 ; data segment
+    db 10011010b ; data segment
     ; limit_16-19 + flags
-    db 0xFC
+    db 11001111b
     ; base 24-31
     db 0
 
@@ -103,7 +86,7 @@ gdt_user_code_segment:
     ; access
     db 0xFA ; user code segment
     ; limit_16-19 + flags
-    db 0xFC
+    db 11001111b
     ; base 24-31
     db 0
 
@@ -120,7 +103,7 @@ gdt_user_data_segment:
     ; access
     db 0xF2 ; user data segment
     ; limit_16-19 + flags
-    db 0xFC
+    db 11001111b
     ; base 24-31
     db 0
 

@@ -28,7 +28,7 @@ function BuildBiosTarget {
 
 function CleanBinDirectoryTarget {
     if(Test-Path("./bin")) {
-        rm -Verbose -Recurse ./bin
+        rm -Verbose -Recurse -Force ./bin
     }
 }
 

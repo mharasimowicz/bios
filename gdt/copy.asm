@@ -14,25 +14,38 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-idt_ptr:
-dw idt_end - idt_start
-dd idt_start
 
-idt_start:
+; here we are coping GDT from 0xF1000 to 0x01000
 
+copy_gdt:
+    xor eax, eax
+    mov es, ax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
 
-idt_end:
+copy_gdt_ptr:
+    mov eax, gdt_ptr
+    mov bx, word [cs:eax + 0]
+    mov ecx, dword [cs:eax + 2]
+    mov [es:eax + 0], word bx ; size
+    mov [es:eax + 2], dword ecx ; address
 
-; IDT_ADDRESS equ 0x000f0900
+copy_gdt_data:
+    mov edx, ecx
+    mov eax, edx
+    add eax, ebx
+    
+copy_single_gdt_byte:
+    mov bl, byte [cs:edx]
+    mov [es:edx], byte bl
 
-; times IDT_ADDRESS - ($-$$) db 0
-
-; idt_ptr:
-; dw 0x1234
-; dd 0x87654321
-
-; START_ADDRESS equ 0x000f1000
-
-; times START_ADDRESS - ($-$$) db 0
-
-; main loop
+    inc edx
+    cmp edx, eax
+    jl copy_single_gdt_byte
+copy_gdt_done:
+    xor eax, eax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
+    ret

@@ -14,52 +14,71 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 ;16 bit mode
 [bits 16]
 
-times 0xf0000 - ($-$$) db 0
+times 0x1000 - ($-$$) db 0x90 ; 0x90 - NOP will mean unused/uninitialized memory
+%include "gdt\data.asm"
+%include "gdt\copy.asm"
 
-; main loop
+times 0x1100 - ($-$$) db 0x90 
+%include "idt\init.asm"
+
+;32 bit mode code
+[bits 32]
+times 0x2000 - ($-$$) db 0x90
+start_32bit_protected_mode_code:
+    sti
+    ; woohooo we are in the protected mode!
+    mov eax, 0xbbbbbbbb
+    jmp $
+end_start_32bit_protected_mode_code:
+
+
+
+[bits 16]
+times 0x3000 - ($-$$) db 0x90
+
+%include "real_mode\ivt_init.asm"
+%include "real_mode\enter_protected_mode.asm"
+%include "real_mode\copy_32bit_code.asm"
+
+;
+; this is entry of real mode
+;
+times 0x4000 - ($-$$) db 0x90
 __start:
-mov ax, 0x0000
-mov es, ax
-mov ds, ax
+
+; setting up registers
 xor ax, ax
 xor bx, bx
 xor cx, cx
 xor dx, dx
-
-; setting up stack to 0xfffe
-mov ax, 0x0000
-mov ss, ax
-mov sp, 0xfffe
-
-
-; setting up segments
 mov ax, cs
 mov ds, ax
 mov es, ax
 mov fs, ax
 mov gs, ax
 
-call ivt_init
-call gdt_init
-call idt_init
+; setting up stack to 0x1000
+mov ax, 0x0000
+mov ss, ax
+mov sp, 0x1000
 
+call ivt_init
+call copy_32bit_code
+
+jmp enter_protected_mode
+; we should not be here
+mov eax, 0x0000dead
+hlt
 jmp $
 
-
-%include "ivt\init.asm"
-%include "gdt\init.asm"
-%include "idt\init.asm"
-
-
-
-;%include "enter_protected_mode.asm"
 ; padding for initial step
-times 0xffff0 - ($-$$) db 0
-
+times 0xfff0 - ($-$$) db 0x90
+[bits 16]
 ; jumping to start
-jmp 0xf000:0x0000 ;__start
+jmp 0xf000:__start
 
-times 0x100000 - ($-$$) db 0
+times 0x10000 - ($-$$) db 0x90
