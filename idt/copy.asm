@@ -14,25 +14,27 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-idt_ptr:
-dw idt_end - idt_start
-dd idt_start
 
-idt_start:
+; here we are coping IDT (with handlers code) from 0xF1100 to 0x01100
 
+copy_idt:
+    xor eax, eax
+    mov es, ax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
+    mov edx, idt_ptr
+    mov eax, idt_handlers_end
+copy_single_idt_byte:
+    mov bl, byte [cs:edx]
+    mov [es:edx], byte bl
 
-idt_end:
-
-; IDT_ADDRESS equ 0x000f0900
-
-; times IDT_ADDRESS - ($-$$) db 0
-
-; idt_ptr:
-; dw 0x1234
-; dd 0x87654321
-
-; START_ADDRESS equ 0x000f1000
-
-; times START_ADDRESS - ($-$$) db 0
-
-; main loop
+    inc edx
+    cmp edx, eax
+    jl copy_single_idt_byte
+copy_idt_done:
+    xor eax, eax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
+    ret

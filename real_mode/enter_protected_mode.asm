@@ -32,9 +32,10 @@ enable_a20_line:
     out 0x92, al
 
     call copy_gdt
+    call copy_idt
 
     lgdt [gdt_ptr]
-    ;lidt [idt_ptr]
+    lidt [idt_ptr]
 
 set_segment_descriptors:
     mov cx, 0x10
@@ -46,7 +47,7 @@ set_segment_descriptors:
     
 enable_protected_mode:
     mov eax, cr0 
-    or al, 1       ; set PE (Protection Enable) bit in CR0 (Control Register 0)
+    or  al, 1       ; set PE (Protection Enable) bit in CR0 (Control Register 0)
     mov cr0, eax
 
 jump_to_32bit_mode:

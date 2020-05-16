@@ -23,7 +23,8 @@ times 0x1000 - ($-$$) db 0x90 ; 0x90 - NOP will mean unused/uninitialized memory
 %include "gdt\copy.asm"
 
 times 0x1100 - ($-$$) db 0x90 
-%include "idt\init.asm"
+%include "idt\data.asm"
+%include "idt\copy.asm"
 
 ;32 bit mode code
 [bits 32]
@@ -45,10 +46,6 @@ flush_segment_registers:
     mov eax, dword [ss:0x0000]
     xor eax, eax
 
-    ;mov eax, dword [ss:0x1000]
-    ; cli
-    ; lgdt [gdt_ptr]
-    ; sti
     jmp $
 
 end_start_32bit_protected_mode_code:
