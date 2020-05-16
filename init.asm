@@ -82,6 +82,13 @@ flush_segment_registers:
     mov eax, dword [ss:0x0000]
     xor eax, eax
 
+reenable_nmi:
+
+    in al, 0x70
+    and al, 0x7f
+    out 0x70, al
+
+
     jmp $
 
 end_start_32bit_protected_mode_code:
