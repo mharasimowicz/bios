@@ -31,8 +31,26 @@ times 0x2000 - ($-$$) db 0x90
 start_32bit_protected_mode_code:
     sti
     ; woohooo we are in the protected mode!
-    mov eax, 0xbbbbbbbb
+flush_segment_registers:
+    mov ax, 0x10
+    mov es, ax
+    mov ds, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov eax, dword [es:0x0000]
+    mov eax, dword [ds:0x0000]
+    mov eax, dword [fs:0x0000]
+    mov eax, dword [gs:0x0000]
+    mov eax, dword [ss:0x0000]
+    xor eax, eax
+
+    ;mov eax, dword [ss:0x1000]
+    ; cli
+    ; lgdt [gdt_ptr]
+    ; sti
     jmp $
+
 end_start_32bit_protected_mode_code:
 
 

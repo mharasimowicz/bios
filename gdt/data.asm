@@ -67,7 +67,7 @@ gdt_data_segment:
     ; base 16-23
     db 0
     ; access
-    db 10011010b ; data segment
+    db 10010010b ; data segment
     ; limit_16-19 + flags
     db 11001111b
     ; base 24-31
