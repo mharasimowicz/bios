@@ -14,12 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-if(-not($Env:PATH -contains "NASM")) {
-    Write-Output "Ammending PATH  with NASM";
-    $Env:PATH = "$($Env:PATH);C:\Program Files\NASM\";
-} else {
-    Write-Output "NASM present in PATH";
-}
 $AS = "nasm.exe";
 
 function BuildBiosTarget {

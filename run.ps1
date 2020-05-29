@@ -15,4 +15,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-& D:\programs\bochs\Bochs-2.6.11\bochsdbg.exe -f .\bochsrc.bxrc
+& bochsdbg.exe -f .\bochsrc.bxrc
