@@ -1,0 +1,5 @@
+[bits 16]
+; jumping to start
+jmp 0xf000:0x3000
+
+times 0x10 - ($-$$) db 0x90

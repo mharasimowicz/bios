@@ -14,67 +14,19 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-;16 bit mode
-[bits 16]
-
-times 0x1000 - ($-$$) db 0x90 ; 0x90 - NOP will mean unused/uninitialized memory
-%include "gdt\data.asm"
-%include "gdt\copy.asm"
-
-times 0x1100 - ($-$$) db 0x90 
-%include "idt\data.asm"
-%include "idt\copy.asm"
-
-times 0x2000 - ($-$$) db 0x90
-%include "real_mode\ivt_init.asm"
-%include "real_mode\enter_protected_mode.asm"
-%include "real_mode\copy_32bit_code.asm"
-
-;
-; this is entry of real mode
-;
-times 0x3000 - ($-$$) db 0x90
-__start:
-
-; setting up registers
-xor ax, ax
-xor bx, bx
-xor cx, cx
-xor dx, dx
-mov ax, cs
-mov ds, ax
-mov es, ax
-mov fs, ax
-mov gs, ax
-
-; setting up stack to 0x1000
-mov ax, 0x0000
-mov ss, ax
-mov sp, 0x1000
-
-call ivt_init
-call copy_32bit_code
-
-jmp enter_protected_mode
-; we should not be here
-mov eax, 0x0000dead
-hlt
-jmp $
-
-;32 bit mode code
 [bits 32]
-times 0x4000 - ($-$$) db 0x90
+
 start_32bit_protected_mode_code:
     sti
     ; woohooo we are in the protected mode!
 flush_segment_registers:
-    mov ax, 0x10
+    mov eax, dword 0x10
     mov es, ax
     mov ds, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
+    mov esp, 0x00001000
     mov eax, dword [es:0x0000]
     mov eax, dword [ds:0x0000]
     mov eax, dword [fs:0x0000]
@@ -89,14 +41,24 @@ reenable_nmi:
     out 0x70, al
 
 
+    ;jmp enter_long_mode
+
+    mov eax, dword 0xcccc7777
+    ; we should not be here
+    ;hlt
     jmp $
 
 end_start_32bit_protected_mode_code:
+enter_long_mode:
+    ;Disable irqs
+    ;cli
+    mov eax, 0xccbbaa00
+
+    jmp $
+
+times 0x1000 - ($-$$) db 0x90 ; 0x90 - NOP will mean unused/uninitialized memory
+%include "./src/gdt64/data.asm"
+%include "./src/gdt64/copy.asm"
 
 ; padding for initial step
-times 0xfff0 - ($-$$) db 0x90
-[bits 16]
-; jumping to start
-jmp 0xf000:__start
-
-times 0x10000 - ($-$$) db 0x90
+times 0xbff0 - ($-$$) db 0x90

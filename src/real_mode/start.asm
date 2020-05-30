@@ -14,27 +14,33 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+;
+; this is entry of real mode
+;
 
-; here we are coping IDT (with handlers code) from 0xF1100 to 0x01100
+__start:
 
-copy_idt:
-    xor eax, eax
-    mov es, ax
-    xor ebx, ebx
-    xor ecx, ecx
-    xor edx, edx
-    mov edx, idt_ptr
-    mov eax, idt_handlers_end
-copy_single_idt_byte:
-    mov bl, byte [cs:edx]
-    mov [es:edx], byte bl
+; setting up registers
+xor ax, ax
+xor bx, bx
+xor cx, cx
+xor dx, dx
+mov ax, cs
+mov ds, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
 
-    inc edx
-    cmp edx, eax
-    jl copy_single_idt_byte
-copy_idt_done:
-    xor eax, eax
-    xor ebx, ebx
-    xor ecx, ecx
-    xor edx, edx
-    ret
+; setting up stack to 0x1000
+mov ax, 0x0000
+mov ss, ax
+mov sp, 0x1000
+
+call ivt_init
+call copy_32bit_code
+
+jmp enter_protected_mode
+; we should not be here
+mov eax, 0x0000dead
+hlt
+jmp $
