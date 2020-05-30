@@ -16,17 +16,26 @@
 
 [bits 32]
 
+; 0x90 - NOP will mean unused/uninitialized memory
+%define NOT_INITIALIZED_OPCODE      0x90
+%define DATA_SEGMENT                0x10
+%define PROTECTED_MODE_STACK_START  0x00001000
+
+; alignment addresses
+%define GDT64_ALIGNMENT             0x1000
+%define PROTECTED_MODE_CODE_SIZE    0xbff0
+
 start_32bit_protected_mode_code:
     sti
     ; woohooo we are in the protected mode!
 flush_segment_registers:
-    mov eax, dword 0x10
+    mov eax, dword DATA_SEGMENT
     mov es, ax
     mov ds, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    mov esp, 0x00001000
+    mov esp, PROTECTED_MODE_STACK_START
     mov eax, dword [es:0x0000]
     mov eax, dword [ds:0x0000]
     mov eax, dword [fs:0x0000]
@@ -56,9 +65,9 @@ enter_long_mode:
 
     jmp $
 
-times 0x1000 - ($-$$) db 0x90 ; 0x90 - NOP will mean unused/uninitialized memory
+times GDT64_ALIGNMENT - ($-$$) db NOT_INITIALIZED_OPCODE
 %include "./src/gdt64/data.asm"
 %include "./src/gdt64/copy.asm"
 
-; padding for initial step
-times 0xbff0 - ($-$$) db 0x90
+; padding
+times PROTECTED_MODE_CODE_SIZE - ($-$$) db NOT_INITIALIZED_OPCODE
